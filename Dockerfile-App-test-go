@@ -1,0 +1,12 @@
+FROM golang:1.12.6 AS builder
+WORKDIR /src/github.com/webserver
+ENV GOPATH /:/src/github.com/webserver
+ADD . /src/github.com/webserver
+RUN apt-get update -y && apt-get install gcc
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build webserver.go
+
+
+FROM test-go-base-image:v3
+COPY --from=builder /src/github.com/webserver/webserver /
+RUN chmod +x /webserver
+
